@@ -12,9 +12,10 @@ $link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 if($link === false){
     die("ERROR: Could not connect. " . mysqli_connect_error());
 }
-$username = $password = $confirm_password = "";
-$username_err = $password_err = $confirm_password_err = "";   
- 
+$username = $password = $confirm_password = $role ="";
+$username_err = $password_err = $confirm_password_err = $role_err= "";   
+
+
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
  
@@ -70,18 +71,52 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
     
 
-    if(empty($username_err) && empty($password_err) && empty($confirm_password_err)){
+    if(empty(trim($_POST["role"]))){
+        $role_err = "Please enter a role.";
+    } else{
+   
+        $sql = "SELECT id FROM users WHERE role = ?";
+        
+        if($stmt = mysqli_prepare($link, $sql)){
+           
+            mysqli_stmt_bind_param($stmt, "s", $param_role);
+       
+            $param_role = trim($_POST["role"]);
+            
+            
+            if(mysqli_stmt_execute($stmt)){
+           
+                mysqli_stmt_store_result($stmt);
+                
+                if(mysqli_stmt_num_rows($stmt) == 1){
+                    $role_err = "This role is already taken.";
+                } else{
+                    $role = trim($_POST["role"]);
+                }
+            } else{
+                echo "Oops! Something went wrong. Please try again later.";
+            }
+
+         
+            mysqli_stmt_close($stmt);
+        }
+    }
+    
+    
+
+    if(empty($username_err) && empty($password_err) && empty($confirm_password_err) && empty($confirm_role_err)){
         
       
-        $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+        $sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
          
         if($stmt = mysqli_prepare($link, $sql)){
       
-            mysqli_stmt_bind_param($stmt, "ss", $param_username, $param_password);
+            mysqli_stmt_bind_param($stmt, "sss", $param_username, $param_password, $param_role);
             
     
             $param_username = $username;
             $param_password = password_hash($password, PASSWORD_DEFAULT); 
+            $param_role = $role;
 
             if(mysqli_stmt_execute($stmt)){
      
@@ -165,6 +200,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <input type="password" name="confirm_password" class="form-control" value="<?php echo $confirm_password; ?>">
                 <span class="help-block"><?php echo $confirm_password_err; ?></span>
             </div>
+            <div class="form-group <?php echo (!empty($role_err)) ? 'has-error' : ''; ?>">
+            <label>role</label>
+                <input type="text" name="role" class="form-control" value="<?php echo $role; ?>">
+                <span class="help-block"><?php echo $role_err; ?></span>
+            </div> 
             <div class="form-group">
                 <input type="submit" class="btn btn-primary" value="Submit">
                 <input type="reset" class="btn btn-default" value="Reset">
