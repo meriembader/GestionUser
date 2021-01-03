@@ -1,7 +1,7 @@
 <?php  
      include_once "../../../controller/usersC.php";
      include_once "../../../model/users.php";
-     
+     include_once "session.php";
 
   
 
@@ -282,7 +282,7 @@ $paginations = ceil($count / $per_page);
       <div class="top-menu">
         <ul class="nav pull-right top-menu">
           <li>
-            <a class="logout" href="../../logout.php">Logout</a>
+            <a class="logout" href="../../front/logout.php">Logout</a>
           </li>
         </ul>
       </div>
@@ -299,7 +299,10 @@ $paginations = ceil($count / $per_page);
           <p class="centered">
             <a href="profile.html"><img src="img/ui-sam.jpg" class="img-circle" width="80"></a>
           </p>
-          <h5 class="centered">Sam Soffes</h5>
+          <?php
+$sql="SELECT * FROM users where id=$loggedin_id";
+$result=mysqli_query($con,$sql);
+?>
           <li class="mt">
             <a href="index.php">
               <i class="fa fa-dashboard"></i>
