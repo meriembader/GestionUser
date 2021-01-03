@@ -4,7 +4,7 @@ session_start();
  
 
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    header("location: welcome.php");
+    header("location: statistiqueUser.php");
     exit;
 }
  
@@ -68,7 +68,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             $_SESSION["username"] = $username;                            
                             
                           
-                            header("location: list_produits.php");
+                            header("location:stat/statistiqueUser.php");
                         } else{
                      
                             $password_err = "The password you entered was not valid.";
